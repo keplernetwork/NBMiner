@@ -2,7 +2,7 @@
 
 # NBMiner
 
-NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、`SWAP`挖矿软件。
+NVIDIA、AMD显卡的`ETH`, `RVN`, `TRB`, `CKB`, `GRIN`, `AE`, `BTM`, `SERO`, `HNS`, `BFC`, `SIPC`挖矿软件。
 
 ## 下载地址
 
@@ -33,7 +33,7 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 | hns_ethash       | HNS+ETH |  76M+19M   |  120M+30M  | 158M+26.2M | 176M+44M | 305M+34M |  68M+22.5M   |
 | trb              |   TRB   |    280M    |    435M    |    510M    |   750M   |   880M   |      X       |
 | trb_ethash       | TRB+ETH | 122M+20.3M |  170M+34M  | 240M+26.7M | 315M+45M |    -     |      X       |
-| kawpow           |  RVNt   |   10.3M    |   17.5M    |   13.3M    |  22.5M   |  25.8M   |     11M      |
+| kawpow           |   RVN   |   10.3M    |   17.5M    |   13.3M    |  22.5M   |  25.8M   |     11M      |
 
 ## 功能特点
 
@@ -42,7 +42,7 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 - 支持SSL方式连接矿池
 - 开发手续费:
   - tensority(Pascal) 2%, tensority(Turing) 3%, tensority_ethash 3%
-  - ethash 0.65%
+  - ethash 1%
   - cuckaroo & cuckarood & cuckatoo & cuckoo_ae & cuckaroo_swap 2%
   - progpow_sero 2%
   - sipc 2%
@@ -75,7 +75,7 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 | hns_ethash       | HNS+ETH | 6.0, 6.1, 7.0, 7.5 |          4GB          |      4GB       |
 | trb              |   TRB   | 6.0, 6.1, 7.0, 7.5 |         0.1GB         |     0.1GB      |
 | trb_ethash       | TRB+ETH | 6.0, 6.1, 7.0, 7.5 |          4GB          |      4GB       |
-| kawpow | RVNt | 6.0, 6.1, 7.0, 7.5 | 3GB | 3GB |
+| kawpow | RVN | 6.0, 6.1, 7.0, 7.5 | 3GB | 3GB |
 
 - \* Compute Capability 查询参考链接: [维基百科](<https://en.wikipedia.org/wiki/CUDA#GPUs_supported>)
 
@@ -173,7 +173,7 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 
 - **uupool**: nbminer -a trb_ethash -o stratum+tcp://trb.uupool.cn:11002 -u wallet.worker -do stratum+tcp://eth.uupool.cn:8008 -du wallet.worker
 
-#### RVNt
+#### RVN
 
 - **minermore**: nbminer -a kawpow -o stratum+tcp://rvnt.minermore.com:4505 -u wallet.worker:passwd
 
@@ -203,6 +203,7 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 - -d, --devices \<devices>    指定使用哪些显卡来挖矿. 比如: "-d 0,1,2,3" 使用前4个显卡.
 - -i, --intensity \<intensities>    GPU使用强度列表 (1 -100)，默认100.
 - --strict-ssl    使用SSL连接时验证矿池证书
+- --proxy    使用Socks5代理连接矿池，例如: 127.0.0.1:1080
 - --cuckoo-intensity \<intensity>    设置挖Grin时的CPU负载，取值范围[1,12]，值越小挖矿算力越高，相对应的CPU负载也会更高。设置为0软件从1开始自适应调整。默认为0
 - --cuckatoo-power-optimize    减小多卡矿机挖Grin31的总功耗波动，避免电源过载关机（设置该选项可能导致算力略微降低，请测试后谨慎使用）
 - --temperature-limit \<temp-limit>    设置显卡温度上限，一旦超过，停止挖矿10s后继续
@@ -211,11 +212,14 @@ NVIDIA、AMD显卡的`GRIN`、`AE`、`CKB`、`SERO`、`SIPC`、`BTM`、`ETH` 、
 - --no-nvml    不周期性地查询GPU的温度功耗等状态.
 - --fidelity-timeframe \<timeframe>    设置保真度计算的时间范围，以小时为单位，默认24.
 - --long-format    使用更长的日期时间格式
+- --verbose    在日志中输出与矿池的通信数据
 - --device-info    打印显卡的CUDA信息.
 - --generate-config \<filename>    生成一个样例配置文件.
 - --no-watchdog    不启动看门狗进程.
 - --platform \<platform>    选择平台，0: NVIDIA+AMD (默认), 1: 只启用NVIDIA, 2: 只启用AMD
 - --coin \<coin>    设置ethash算法的币种，如 eth、etc
+- **--mt, --memory-tweak \<mode>    Nvidia GDDR5 & GDDR5X 显卡时序优，取值 [1-6]，值越大算力越高。可以通过逗号分隔的列表针对每张卡单独设置，如：`-mt 4,5,6` 分别将0,1,2号卡的mt值设为4,5,6。可能需要提高功耗限制以达到更高的算力。如果你的矿机温度较高，可能会出现更高的拒绝率，此时可以降低数值再尝试。windows下使用该命令需提前进行驱动安装，详见`--driver`参数说明。linux下使用，需加`sudo`使用管理员权限运行。使用该命令后，1080、1080ti挖ETH不再需要OhGodAnETHlargementPill**
+- **--driver \<action>    windows独有选项，如果要使用`-mt`，则需提前使用该选项安装驱动。管理员权限运行`nbminer.exe --driver install` 安装驱动，卸载使用`nbminer.exe --driver uninstall`**
 
 ## API查询接口
 
@@ -232,42 +236,79 @@ GET http://api_host:port/api/v1/status
 ```json
 {
     "miner": {
-        "devices": [{
-            "core_clock": 1556,
-            "core_utilization": 100,
-            "fan": 36,
-            "hashrate": 1499,
-            "id": 0,
-            "info": "GeForce GTX 1080 Ti 11178 MB",
-            "power": 182,
-            "temperature": 65
-        }, {
-            "core_clock": 1518,
-            "core_utilization": 100,
-            "fan": 34,
-            "hashrate": 1490,
-            "id": 1,
-            "info": "GeForce GTX 1080 Ti 11178 MB",
-            "power": 172,
-            "temperature": 62
-        }],
-        "total_hashrate": 2989,
-        "total_power_consume": 354
+        "devices": [
+            {
+                "accepted_shares": 2,
+                "accepted_shares2": 0,
+                "core_clock": 1620,
+                "core_utilization": 100,
+                "fan": 47,
+                "fidelity1": 5.859799716605649,
+                "fidelity2": 0,
+                "hashrate": "217.1 M",
+                "hashrate2": "36.19 M",
+                "hashrate2_raw": 36190716.266428046,
+                "hashrate_raw": 217144297.59856823,
+                "id": 0,
+                "info": "GeForce RTX 2070",
+                "mem_clock": 6801,
+                "mem_utilization": 86,
+                "pci_bus_id": 1,
+                "power": 188,
+                "rejected_shares": 0,
+                "rejected_shares2": 0,
+                "temperature": 72
+            },
+            {
+                "accepted_shares": 0,
+                "accepted_shares2": 0,
+                "core_clock": 1607,
+                "core_utilization": 100,
+                "fan": 0,
+                "fidelity1": 0,
+                "fidelity2": 0,
+                "hashrate": "168.5 M",
+                "hashrate2": "42.11 M",
+                "hashrate2_raw": 42113955.19774488,
+                "hashrate_raw": 168455820.79097953,
+                "id": 1,
+                "info": "P102-100",
+                "mem_clock": 5508,
+                "mem_utilization": 100,
+                "pci_bus_id": 4,
+                "power": 232,
+                "rejected_shares": 0,
+                "rejected_shares2": 0,
+                "temperature": 57
+            }
+        ],
+        "total_hashrate": "708 M",
+        "total_hashrate2": "164.4 M",
+        "total_hashrate2_raw": 164395439.13815895,
+        "total_hashrate_raw": 708044466.8349969,
+        "total_power_consume": 839
     },
-    "start_time": 1532482659,
+    "reboot_times": 0,
+    "start_time": 1586944619,
     "stratum": {
-        "accepted_share_rate": 0.99,
-        "accepted_shares": 99,
-        "password": "",
-        "rejected_share_rate": 0.01,
-        "rejected_shares": 1,
-        "url": "btm.pool.zhizhu.top:3859",
+        "accepted_shares": 2,
+        "accepted_shares2": 0,
+        "algorithm": "hns_ethash",
+        "difficulty": "8.59 G",
+        "difficulty2": "8.59 G",
+        "dual_mine": true,
+        "latency": 221,
+        "latency2": 0,
+        "rejected_shares": 0,
+        "rejected_shares2": 0,
+        "url": "handshake.hk.nicehash.com:3384",
+        "url2": "daggerhashimoto.hk.nicehash.com:3353",
         "use_ssl": false,
-        "user": "bmxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test",
-        "difficulty": "0003ffff",
-        "latency": 65
+        "use_ssl2": false,
+        "user": "3QHNv52ahdCyeYTGVYDPGjRzMpkknjjfAf.test",
+        "user2": "3QHNv52ahdCyeYTGVYDPGjRzMpkknjjfAf.test"
     },
-    "version": "v10.0"
+    "version": "30.0"
 }
 ```
 
@@ -286,6 +327,14 @@ GET http://api_host:port/api/v1/status
 - 当核心超频过度，或者显卡本身的核心体质不好时，会因为显卡内部计算错误，导致出现各种的CUDA错误。此时应该尝试 检查转接板连接稳定性、降低核心频率、降低功耗，再做尝试。
 
 ## 修改记录
+
+#### v30.0(2020-04-30)
+
+- 新增`--memory-tweak`选项，用于优化Nvidia GD5和GD5X的显卡时序。详细说明见readme_zh.md
+- 新增`--verbose`选项，可打印与矿池的通信数据
+- 新增`--proxy` 选项，用户可设置通过socks5代理与矿池进行连接
+- 在日志和api中新增单个GPU的share数量统计
+- 细节修复和改进
 
 #### v29.1(2020-04-09)
 
